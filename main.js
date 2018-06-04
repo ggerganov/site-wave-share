@@ -168,6 +168,18 @@ function getIPs(callback){
     }, 1000);
 }
 
+function transmitText(sText) {
+    var r = new Uint8Array(256);
+    for (var i = 0; i < sText.length; ++i) {
+        r[i] = sText.charCodeAt(i);
+    }
+
+    var buffer = Module._malloc(256);
+    Module.writeArrayToMemory(r, buffer, 256);
+    Module.cwrap('setText', 'number', ['number', 'buffer'])(sText.length, buffer);
+    Module._free(buffer);
+}
+
 function transmitRelevantData(sdp, dataType) {
     var res = parseSDP(sdp);
     var hashparts = null;
@@ -208,6 +220,8 @@ function transmitRelevantData(sdp, dataType) {
     }
 
     r[1] = 40 + credentials.length;
+
+    console.log("Data length = " + r[1]);
 
     var buffer = Module._malloc(256);
     Module.writeArrayToMemory(r, buffer, 256);
@@ -332,11 +346,13 @@ function updatePeerInfo() {
     } else if (framesLeftToRecord > Math.max(0, 0.05*framesToRecord)) {
         firstTimeFail = true;
         peerInfo.innerHTML=
-            "Sound handshake in progress: <progress value=" + (framesToRecord - framesLeftToRecord) +
+            "Transmission in progress: <progress value=" + (framesToRecord - framesLeftToRecord) +
             " max=" + (framesToRecord) + "></progress>";
         peerReceive.innerHTML= "";
     } else if (framesToRecord > 0) {
         peerInfo.innerHTML= "Analyzing Rx data ...";
+    } else if (framesToRecord == 0) {
+        peerInfo.innerHTML= "<p>Listening for waves ...</p>";
     } else if (framesToRecord == -1) {
         if (firstTimeFail) {
             playSound("/media/case-closed");
@@ -382,10 +398,12 @@ function checkRxForPeerData() {
     if (typeof Module === 'undefined') return;
     Module.cwrap('getText', 'number', ['buffer'])(bufferRx);
     var result = "";
-    for(var i = 0; i < 82; ++i){
+    for(var i = 0; i < 140; ++i){
         result += (String.fromCharCode((Module.HEAPU8)[bufferRx + i]));
         brx[i] = (Module.HEAPU8)[bufferRx + i];
     }
+
+    document.getElementById('rxData').innerHTML = result;
 
     if (String.fromCharCode(brx[0]) == "O") {
         var lastSenderRequestTmp = brx;

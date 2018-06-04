@@ -14,8 +14,8 @@
             <section>
                 <div id="sound"></div>
 
-                <input type="radio" name="dataType" value="file" onClick="doInit('file')" disabled> File
-                <input type="radio" name="dataType" value="text" onClick="doInit('text')" disabled> Text
+                <input type="radio" name="dataType" value="file" onClick="doInit('file')"> File
+                <input type="radio" name="dataType" value="text" onClick="doInit('text')"> Text
                 <input type="radio" name="dataType" value="null" disabled checked hidden>
 
                 <br> <br>
@@ -26,20 +26,26 @@
                             <form id="fileInfo">
                                 <input type="file" id="fileInput" name="files"/>
                             </form>
-                            <form id="textInfo">
-                                <textarea id="textInput" cols=40 rows=2 maxlength=82 name="text"></textarea>
-                            </form>
+                        </td>
+                    </tr>
+                    <tr id="textInfo">
+                        <td colspan=1>
+                            <div>Rx data:</div> <textarea name="textarea" id="rxData" style="width:300px;height:100px;" disabled>
+                            </textarea>
+                        </td>
+                        <td colspan=1>
+                            <div>Tx Data:</div> <textarea name="textarea" id="txData" style="width:300px;height:100px;">This is the message to transmit.</textarea><br>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <button onClick="lockoutSubmit(this); senderInit();">Broadcast</button>
-                        </td>
-                        <td>
-                            <div class="progress">
+                            <div id="sendProgress-section" class="progress">
                                 <div class="label">Send progress: </div>
                                 <progress id="sendProgress" max="0" value="0"></progress>
                             </div>
+                        </td>
+                        <td>
+                            <button onClick="lockoutSubmit(this); doBroadcast();">Broadcast</button>
                         </td>
                     </tr>
                     <tr>
@@ -159,6 +165,20 @@
     var bufferRx = null;
     var brx = new Uint8Array(256);
     var availableNetworks = [];
+
+    function isTxModeText() {
+        var buts = document.getElementsByName("dataType");
+        if (buts[1].checked) return true;
+        return false;
+    }
+
+    function doBroadcast() {
+        if (isTxModeText()) {
+            transmitText(document.getElementById('txData').value);
+        } else {
+            senderInit();
+        }
+    }
 
     function toggleAdvanced() {
         document.getElementById('page-status').hidden = !document.getElementById('page-status').hidden;
@@ -334,8 +354,6 @@
         doNotCaptureKeyboard: true,
         pre: [],
         postRun: [ (function() {
-            var buts = document.getElementsByName("dataType");
-            buts[0].disabled = false;
         }) ],
         print: (function() {
             var element = document.getElementById('output');
@@ -381,15 +399,7 @@
     };
 
     function doInit(dataType) {
-        if (dataType == 'text') {
-            document.getElementById('textInfo').hidden = false;
-            document.getElementById('fileInfo').hidden = true;
-        } else {
-            document.getElementById('textInfo').hidden = true;
-            document.getElementById('fileInfo').hidden = false;
-        }
-
-        if (isInitialized == false) {
+        if (true) {
             Module.cwrap('doInit', 'number', [''])();
 
             e = document.getElementById('waveConfig');
@@ -410,6 +420,18 @@
                 sel.appendChild(opt);
             });
             isInitialized = true;
+        }
+
+        if (dataType == 'text') {
+            document.getElementById('textInfo').hidden = false;
+            document.getElementById('fileInfo').hidden = true;
+            document.getElementById('sendProgress-section').hidden = true;
+            Module.cwrap('setTxMode','',['number'])(1);
+        } else {
+            document.getElementById('textInfo').hidden = true;
+            document.getElementById('fileInfo').hidden = false;
+            document.getElementById('sendProgress-section').hidden = false;
+            Module.cwrap('setTxMode','',['number'])(0);
         }
 
         playSound("/media/plucky");
