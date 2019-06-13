@@ -353,6 +353,17 @@
     var Module = {
         doNotCaptureKeyboard: true,
         pre: [],
+        preRun: [(function() {
+            let constraints = {
+                audio: {
+                    echoCancellation: false,
+                    autoGainControl: false,
+                    noiseSuppression: false
+                }
+            };
+
+            let mediaInput = navigator.mediaDevices.getUserMedia( constraints );
+        }) ],
         postRun: [ (function() {
         }) ],
         print: (function() {
