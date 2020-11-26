@@ -22,6 +22,26 @@
 
                 <table id="main-controls" hidden>
                     <tr>
+                        <td colspan=1>
+                            Tx/Rx protocol:
+                            <select id="waveConfig" onChange="selectConfig(this.value);" title="Before broadcast/receive make sure this is set to the same value for all peers">
+                                <option value=0>Normal</option>
+                                <option value=1 selected>Fast</option>
+                                <option value=2>Fastest</option>
+                                <option value=3>Ultrasonic</option>
+                            </select>
+                            <label hidden id="paramFreqDelta"></label>
+                            <label hidden id="paramFreqStart"></label>
+                            <label hidden id="paramFramesPerTx"></label>
+                            <label hidden id="paramBytesPerTx"></label>
+                        </td>
+                        <td colspan=1>
+                            Volume:
+                            <input type="range" min="1" max="100" value="10" class="slider" id="paramVolume" onInput="updateScroll('Volume');">
+                            / <label id="paramVolumeScroll"></label></td>
+                        </td>
+                    </tr>
+                    <tr>
                         <td colspan=2>
                             <form id="fileInfo">
                                 <input type="file" id="fileInput" name="files"/>
@@ -117,30 +137,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan=1>
-                            <select id="waveConfig" onChange="selectConfig(this.value);" title="Before broadcast/receive make sure this is set to the same value for all peers">
-                                <option value=0>Normal</option>
-                                <option value=1 selected>Fast</option>
-                                <option value=2>Fastest</option>
-                                <option value=3>Ultrasonic</option>
-                            </select>
-                            <label hidden id="paramFreqDelta"></label>
-                            <label hidden id="paramFreqStart"></label>
-                            <label hidden id="paramFramesPerTx"></label>
-                            <label hidden id="paramBytesPerTx"></label>
-                        </td>
-                        <td colspan=1>
-                            Volume:
-                            <input type="range" min="1" max="100" value="10" class="slider" id="paramVolume" onInput="updateScroll('Volume');">
-                            / <label id="paramVolumeScroll"></label></td>
-                        </td>
-                    </tr>
-                    <tr>
                         <td colspan=2>
                             <div id="bitrate"></div>
                         </td>
                     </tr>
                 </table>
+
 
                 <span id="status"></span>
             </section>
@@ -446,9 +448,7 @@
         }
 
         playSound("/media/plucky");
-        var x = document.getElementById("main-controls");
-        //x.style.display = "block";
-        x.hidden = false;
+        document.getElementById("main-controls").hidden = false;
     }
 
     Module.setStatus('Initializing...');
