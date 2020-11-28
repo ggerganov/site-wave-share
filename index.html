@@ -255,7 +255,7 @@
             paramBytesPerTx.value = 3;
         }
 
-        Module.cwrap('setParameters','',['number','number','number','number','number','number','number'])(
+        Module._setParameters(
             paramFreqDelta.value,
             paramFreqStart.value,
             paramFramesPerTx.value,
@@ -268,7 +268,7 @@
         val = document.getElementById('param'+sName).value;
         document.getElementById('param'+sName+'Scroll').innerHTML = val;
 
-        Module.cwrap('setParameters','',['number','number','number','number','number','number','number'])(
+        Module._setParameters(
             paramFreqDelta.value,
             paramFreqStart.value,
             paramFramesPerTx.value,
@@ -279,7 +279,7 @@
 
     function getSampleRate() {
         if (typeof Module === 'undefined') return;
-        var sampleRate = Module.cwrap('getSampleRate', 'number', [''])();
+        var sampleRate = Module._getSampleRate();
     }
 
     var isiOS = /iPad|iPhone|iPod|CriOS/.test(navigator.userAgent) && !window.MSStream;
@@ -291,7 +291,7 @@
     var htmlYellowLED = "<div class=\"led-yellow\"></div>";
 
 	function checkStatus() {
-		var hasDeviceOutput = Module.cwrap('hasDeviceOutput', 'number', [''])();
+		var hasDeviceOutput = Module._hasDeviceOutput();
         {
             var el = document.getElementById('has-device-output');
             if (hasDeviceOutput != 0 && isAudioContextUnlocked) {
@@ -305,7 +305,7 @@
             }
         }
 
-		var hasDeviceCapture = Module.cwrap('hasDeviceCapture', 'number', [''])();
+		var hasDeviceCapture = Module._hasDeviceCapture();
         {
             var el = document.getElementById('has-device-capture');
             if (hasDeviceCapture != 0) {
@@ -417,7 +417,7 @@
         //buts[1].setAttribute('disabled', true);
 
         if (true) {
-            Module.cwrap('doInit', 'number', [''])();
+            Module._doInit();
 
             e = document.getElementById('waveConfig');
             selectConfig(e.options[e.selectedIndex].value);
@@ -443,12 +443,12 @@
             document.getElementById('textInfo').hidden = false;
             document.getElementById('fileInfo').hidden = true;
             document.getElementById('sendProgress-section').hidden = true;
-            Module.cwrap('setTxMode','',['number'])(1);
+            Module._setTxMode(1);
         } else {
             document.getElementById('textInfo').hidden = true;
             document.getElementById('fileInfo').hidden = false;
             document.getElementById('sendProgress-section').hidden = false;
-            Module.cwrap('setTxMode','',['number'])(0);
+            Module._setTxMode(0);
         }
 
         playSound("/media/plucky");
@@ -490,7 +490,7 @@
     }
 
 </script>
-<script async type="text/javascript" src="wave.js"></script>
+<script async type="text/javascript" src="wave-share-wasm.js"></script>
 <script type="text/javascript" src="sdp-transform/grammar.js"></script>
 <script type="text/javascript" src="sdp-transform/parser.js"></script>
 <script type="text/javascript" src="sdp-transform/writer.js"></script>

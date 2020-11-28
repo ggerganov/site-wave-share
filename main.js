@@ -169,7 +169,7 @@ function transmitText(sText) {
 
     var buffer = Module._malloc(256);
     Module.writeArrayToMemory(r, buffer, 256);
-    Module.cwrap('setText', 'number', ['number', 'buffer'])(sText.length, buffer);
+    Module._setText(sText.length, buffer);
     Module._free(buffer);
 }
 
@@ -218,7 +218,7 @@ function transmitRelevantData(sdp, dataType) {
 
     var buffer = Module._malloc(256);
     Module.writeArrayToMemory(r, buffer, 256);
-    Module.cwrap('setText', 'number', ['number', 'buffer'])(r[1], buffer);
+    Module._setText(r[1], buffer);
     Module._free(buffer);
 }
 
@@ -326,10 +326,10 @@ var firstTimeFail = false;
 
 function updatePeerInfo() {
     if (typeof Module === 'undefined') return;
-    var framesLeftToRecord = Module.cwrap('getFramesLeftToRecord', 'number', [])();
-    var framesToRecord = Module.cwrap('getFramesToRecord', 'number', [])();
-    var framesLeftToAnalyze = Module.cwrap('getFramesLeftToAnalyze', 'number', [])();
-    var framesToAnalyze = Module.cwrap('getFramesToAnalyze', 'number', [])();
+    var framesLeftToRecord = Module._getFramesLeftToRecord();
+    var framesToRecord = Module._getFramesToRecord();
+    var framesLeftToAnalyze = Module._getFramesLeftToAnalyze();
+    var framesToAnalyze = Module._getFramesToAnalyze();
 
     if (framesToAnalyze > 0) {
         peerInfo.innerHTML=
@@ -389,7 +389,7 @@ function parseRxData(brx) {
 
 function checkRxForPeerData() {
     if (typeof Module === 'undefined') return;
-    Module.cwrap('getText', 'number', ['buffer'])(bufferRx);
+    Module._getText(bufferRx);
     var result = "";
     for(var i = 0; i < 140; ++i){
         result += (String.fromCharCode((Module.HEAPU8)[bufferRx + i]));
